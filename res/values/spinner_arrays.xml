@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Can be implemented later -->
+    <string-array name="src_array">
+        <item>videotestsrc</item>
+        <item>udpsrc</item>
+        <item>rtpsrc</item>
+        <item>rtspsrc</item>
+    </string-array>
+    <!-- Can be implemented later -->
+    <string-array name="pay_array">
+        <item>rtpav1depay</item>
+        <item>rtph264depay</item>
+        <item>rtph265depay</item>
+        <item>rtpdepay</item>
+    </string-array>
+    <!-- Can be implemented later -->
+    <string-array name="parse_array">
+        <item>av1parse</item>
+        <item>h264parse</item>
+        <item>h265parse</item>
+    </string-array>
+</resources>

@@ -1,0 +1,98 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 33
+
+    defaultConfig {
+        applicationId "com.kranzetech.pipeliner"
+        minSdkVersion 24
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+
+
+        externalNativeBuild {
+            cmake {
+                version "4.1.2"
+
+                def gstRoot
+
+                if (project.hasProperty('gstAndroidRoot'))
+                    gstRoot = project.gstAndroidRoot
+                else
+                    gstRoot = System.env.GSTREAMER_ROOT_ANDROID
+
+                if (gstRoot == null)
+                    throw new GradleException('GSTREAMER_ROOT_ANDROID must be set, or "gstAndroidRoot" must be defined in your gradle.properties in the top level directory of the unpacked universal GStreamer Android binaries')
+
+                arguments "-DANDROID_STL=c++_shared", "-DGSTREAMER_ROOT_ANDROID=$gstRoot", "-GNinja"
+
+                targets "pipeliner"
+
+                // All archs except MIPS and MIPS64 are supported
+                abiFilters  'armeabi-v7a', 'arm64-v8a'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            sourceSets {
+                main {
+                    manifest.srcFile 'AndroidManifest.xml'
+                    java.srcDirs = ['src']
+                    resources.srcDirs = ['src']
+                    aidl.srcDirs = ['src']
+                    res.srcDirs = ['res']
+                    assets.srcDirs = ['assets']
+                }
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'jni/CMakeLists.txt'
+        }
+    }
+    ndkVersion '25.2.9519653'
+
+    namespace 'com.android.pipeliner'
+
+    buildFeatures {
+        aidl true
+    }
+}
+
+afterEvaluate {
+    if (project.hasProperty('compileDebugJavaWithJavac'))
+        project.compileDebugJavaWithJavac.dependsOn 'externalNativeBuildDebug'
+    if (project.hasProperty('compileReleaseJavaWithJavac'))
+        project.compileReleaseJavaWithJavac.dependsOn 'externalNativeBuildRelease'
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.1'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+}
+
+buildscript {
+    repositories {
+        // These are required to find the Android Gradle Plugin
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // You MUST have a line like this to define the AGP plugin
+        // The version must be compatible with compileSdkVersion 32 (e.g., 7.2.2 or higher)
+        classpath 'com.android.tools.build:gradle:7.2.2'
+        // OR a similar recent version
+    }
+}
